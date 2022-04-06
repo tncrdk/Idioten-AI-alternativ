@@ -26,7 +26,7 @@ class AbstractAgent:
 
         self.output = "no play"  # Skal være indeksen til kortet som skal spilles
 
-    """ Spiller """
+    """ PLAYER """
 
     def check_if_finished(self):
         if not (self.hand or self.visible_table_cards or self.hidden_table_cards):
