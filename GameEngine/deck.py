@@ -1,5 +1,5 @@
 from enum import Enum
-from numpy.random import randint
+import numpy.random as np_rand
 
 
 class Card:
@@ -54,10 +54,8 @@ class Deck:
         return len(self.cards)
 
     def shuffle(self) -> None:
-        for _ in range(100):
-            for i in reversed(range(1, len(self.cards))):
-                j = randint(0, i)
-                self.cards[i], self.cards[j] = self.cards[j], self.cards[i]
+        np_rand.shuffle(self.cards)
+        
 
     def generate(self) -> None:
         if not self.is_generated:
