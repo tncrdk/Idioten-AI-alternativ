@@ -1,4 +1,4 @@
-import agent
+import abstract_agent
 import neat
 import math
 

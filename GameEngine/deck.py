@@ -55,7 +55,6 @@ class Deck:
 
     def shuffle(self) -> None:
         np_rand.shuffle(self.cards)
-        
 
     def generate(self) -> None:
         if not self.is_generated:
@@ -64,8 +63,6 @@ class Deck:
                     self.cards.append(Card(value, suit))
             self.shuffle()
             self.is_generated = True
-        else:
-            raise Exception("Deck already generated")
 
     def pop_top_card(self) -> Card:
         return_card = self.cards.pop()
@@ -80,17 +77,11 @@ class Deck:
         else:
             raise ValueError("Det er ikke av typen kort")
 
-    def clear(self) -> None:
+    def clear_deck(self) -> None:
         self.cards.clear()
 
 
 if __name__ == "__main__":
     deck = Deck()
-
-    for card in deck.cards:
-        card.show_card()
-
-    print(len(deck.cards))
-
-    c1 = Card(14, Card.SUITS.DIAMONDS)
-    c1.show_card()
+    deck.sort()
+    print(deck)
