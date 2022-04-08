@@ -3,14 +3,11 @@ import deck
 """
 Format på input:
 
-data = {
-    hand_cards: [...],
-    playable_cards: [...],
-    table_cards: [...],
-    pile: [...],
-    played_cards: [...],
-    burnt_cards: [...]
-}
+state = {
+        "playable_cards": {},
+        "pile": [],
+        "burnt_cards": []
+    }
 """
 
 
@@ -24,9 +21,9 @@ class AbstractAgent:
         self.visible_table_cards = deck.Deck(generate_deck=False)
         self.hidden_table_cards = deck.Deck(generate_deck=False)
 
-        self.output = "no play"  # Skal være indeksen til kortet som skal spilles
-
-    """ PLAYER """
+    """ 
+    PLAYER
+    """
 
     def check_if_finished(self):
         if not (self.hand or self.visible_table_cards or self.hidden_table_cards):
@@ -40,16 +37,38 @@ class AbstractAgent:
         self.hand.add_card(card)
 
     def take_visible_table_cards(self):
-        pass
+        if not (self.deck or self.hand) and self.visible_table_cards:
+            self.hand += self.visible_table_cards
+            self.visible_table_cards.clear_deck()
 
     def take_hidden_table_cards(self):
-        pass
+        if not (self.hand or self.visible_table_cards) and self.hidden_table_cards:
+            self.add_card_to_hand(self.player.table_hidden.pop())
 
-    """ AI """
+    """
+    AI
+    """
 
-    def process_state(self, data: dict) -> None:
+    def return_output(self) -> list:
+        return self.output
+
+    def process_state(self, state: dict) -> None:
         """Choose best play according to the policy"""
         pass
 
-    def return_output(self) -> int:
-        return self.output
+
+class NEAT_Agent1(AbstractAgent):
+    def __init__(self, name="Agent") -> None:
+        super().__init__(name)
+
+    def process_state(self, current_state: dict) -> None:
+        possible_states = []  # [(card_played, state{})]
+        self.find_possible_states(current_state, possible_states)
+
+    def find_possible_states(self, root_state: dict, possible_states: list):
+
+        next_states = []  # Next to be investigated, using root_state
+        possible_states += next_states
+
+        for state in next_states:
+            self.find_possible_states(state, possible_states)
