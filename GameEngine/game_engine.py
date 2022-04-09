@@ -11,7 +11,7 @@ class Game:
             self.deck = deck.Deck()
         self.pile = deck.Deck(generate_deck=False)
 
-        self.rounds = 0
+        self.turns = 0
         self.max_rounds = 10_000
         self.burnt_cards = []
 
@@ -43,7 +43,7 @@ class Game:
         player, opponent = self.players[0], self.players[1]
 
         while not game_finished:
-            self.rounds += 0.5
+            self.turns += 1
             if player.finished:
                 winner = player
                 game_finished = True
@@ -51,9 +51,10 @@ class Game:
 
             self.take_turn(player, opponent)
             player, opponent = opponent, player
-            game_finished = self.rounds > self.max_rounds
+            game_finished = self.turns > self.max_rounds
 
-        return winner, self.rounds  # kan legge til flere stats kanskje
+        tot_rounds = self.turns / 2
+        return winner, tot_rounds  # kan legge til flere stats kanskje
 
     """ 
     PLAY TURN
@@ -92,8 +93,9 @@ class Game:
     ACTIONS
     """
 
-    def make_play(self, player_input: list):
+    def make_play(self, player: abstract_agent.AbstractAgent, player_input: list):
         for play in player_input:
+            player.play_card(play)
             self.apply_side_effects(play)
             # add to oppnents_cards
 

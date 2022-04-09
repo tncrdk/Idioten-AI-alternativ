@@ -68,7 +68,7 @@ class Deck:
         return_card = self.cards.pop()
         return return_card
 
-    def get_top_card(self) -> Card:
+    def return_top_card(self) -> Card:
         return self.cards[-1]
 
     def add_card(self, card) -> None:
@@ -76,6 +76,9 @@ class Deck:
             self.cards.append(card)
         else:
             raise ValueError("Det er ikke av typen kort")
+
+    def pop_card_by_index(self, index):
+        return self.cards.pop(index)
 
     def clear_deck(self) -> None:
         self.cards.clear()

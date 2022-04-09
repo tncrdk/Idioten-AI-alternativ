@@ -45,6 +45,9 @@ class AbstractAgent:
         if not (self.hand or self.visible_table_cards) and self.hidden_table_cards:
             self.add_card_to_hand(self.player.table_hidden.pop())
 
+    def play_card_by_index(self, index):
+        return self.hand.pop_card_by_index(index)
+
     """
     AI
     """
@@ -55,20 +58,3 @@ class AbstractAgent:
     def process_state(self, state: dict) -> None:
         """Choose best play according to the policy"""
         pass
-
-
-class NEAT_Agent1(AbstractAgent):
-    def __init__(self, name="Agent") -> None:
-        super().__init__(name)
-
-    def process_state(self, current_state: dict) -> None:
-        possible_states = []  # [(card_played, state{})]
-        self.find_possible_states(current_state, possible_states)
-
-    def find_possible_states(self, root_state: dict, possible_states: list):
-
-        next_states = []  # Next to be investigated, using root_state
-        possible_states += next_states
-
-        for state in next_states:
-            self.find_possible_states(state, possible_states)
