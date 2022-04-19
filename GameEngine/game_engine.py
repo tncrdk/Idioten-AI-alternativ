@@ -1,10 +1,9 @@
-import enum
 import deck
 import abstract_agent
 
 
 class Game:
-    def __init__(self, custom_deck=None) -> None:
+    def __init__(self, log_turn: bool, custom_deck=None) -> None:
         if bool(custom_deck):
             self.deck = custom_deck
         else:
@@ -14,6 +13,7 @@ class Game:
         self.turns = 0
         self.max_rounds = 10_000
         self.burnt_cards = []
+        self.log_turn = log_turn
 
     """ 
     SETUP
@@ -61,7 +61,7 @@ class Game:
     """
 
     def take_turn(self, player: abstract_agent.AbstractAgent, oppnonent):
-        playable_cards = self.get_playable_cards()
+        playable_cards = self.get_playable_cards(player, self.pile)
         can_play = bool(playable_cards)
         state = {
             "player_hand": player.hand,
@@ -73,15 +73,15 @@ class Game:
         }
 
         if not can_play:
-            self.can_not_play_actions(playable_cards, player, oppnonent)
+            self.can_not_play_actions(playable_cards, player, oppnonent, self.pile)
 
         else:
             player.process_state(state)
             player_input = (
                 player.return_output()
             )  # Returnerer en liste med hvert trekk spilleren gjør i riktig rekkefølge
-            self.make_play(player_input)
-            self.restore_player_hand(player)
+            self.make_play(player_input, self.pile, self.deck)
+            self.restore_player_hand(player, self.deck)
             if not self.deck:
                 player.take_visible_table_cards()
 
@@ -89,28 +89,98 @@ class Game:
             player.take_hidden_table_cards()
         player.check_if_finished()
 
+    def simulate_play(
+        self,
+        player: abstract_agent.AbstractAgent,
+        index: int,
+        card: deck.Card,
+        root_state: dict,
+        cards_played: list,
+    ) -> tuple:
+        pile = root_state["pile"]
+        deck = root_state["deck"]
+        cards_played.append((index, card))
+
+        # sjekk for toere og tiere og sideeffekter
+
     """ 
     ACTIONS
     """
 
-    def make_play(self, player: abstract_agent.AbstractAgent, player_input: list):
+    def make_play(
+        self,
+        player: abstract_agent.AbstractAgent,
+        player_input: list,
+        pile: deck.Deck,
+        deck: deck.Deck,
+    ) -> None:
         for play in player_input:
             player.play_card(play)
-            self.apply_side_effects(play)
+            self.apply_side_effects(play, pile, deck)
             # add to oppnents_cards
 
     def can_not_play_actions(
         self,
         player: abstract_agent.AbstractAgent,
         opponent: abstract_agent.AbstractAgent,
-    ):
-        player.hand += self.pile.cards
-        opponent.opponents_cards += self.pile.cards
-        self.pile.clear()
+        pile: deck.Deck,
+    ) -> None:
+        player.hand += pile.cards
+        opponent.opponents_cards += pile.cards
+        pile.clear()
 
-    def restore_player_hand(self, player: abstract_agent.AbstractAgent):
-        while len(player.hand) < 3 and self.deck:
-            player.add_card_to_hand(self.deck.pop_top_card())
+    def restore_player_hand(
+        self, player: abstract_agent.AbstractAgent, deck: deck.Deck
+    ) -> None:
+        while len(player.hand) < 3 and deck:
+            player.add_card_to_hand(deck.pop_top_card())
 
-    def log_turn(self):
+    def log_turn(self) -> None:
         pass
+
+    """ 
+    GET-FUNCTIONS
+    """
+
+    def get_playable_cards(
+        self, player: abstract_agent.AbstractAgent, pile: deck.Deck, is_building: bool
+    ) -> list:
+        if not bool(pile):
+            playable_cards = list(enumerate(player.hand))
+            return playable_cards
+
+        playable_cards = []
+
+        if is_building:
+            for index, card in enumerate(player.hand):
+                if self.check_if_buildable_card(card, pile.get_top_card()):
+                    playable_cards.append((index, card))
+            return playable_cards
+
+        else:
+            for index, card in enumerate(player.hand):
+                if self.check_if_playable_card(card):
+                    playable_cards.append((index, card))
+            return playable_cards
+
+    """
+    CHECKS
+    """
+
+    def check_if_playable_card(self, card, top_pile_card) -> bool:
+        if not bool(top_pile_card):
+            return True
+        elif card.value == 2 or card.value == 10:
+            return True
+        elif card.value >= top_pile_card.value:
+            return True
+        return False
+
+    def check_if_buildable_card(self, card, top_pile_card) -> bool:
+        if card.value == 10:
+            return False
+        if top_pile_card.value == card.value:
+            return True
+        if top_pile_card.value + 1 == card.value:
+            return True
+        return False

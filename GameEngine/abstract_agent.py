@@ -37,7 +37,7 @@ class AbstractAgent:
         self.hand.add_card(card)
 
     def take_visible_table_cards(self):
-        if not (self.deck or self.hand) and self.visible_table_cards:
+        if not self.hand and self.visible_table_cards:
             self.hand += self.visible_table_cards
             self.visible_table_cards.clear_deck()
 
