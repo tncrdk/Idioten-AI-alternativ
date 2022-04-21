@@ -108,10 +108,14 @@ class Game:
 
         deck.add_card(player.play_card_by_index(index))
         self.apply_side_effects(card, pile, deck, burnt_cards)
-        root_state["playable_cards"] = self.get_playable_cards(player, pile, True)
+
+        playable_cards = self.get_playable_cards(player, pile, True)
+        root_state["playable_cards"] = playable_cards
 
         if card.value == 10 or card.value == 2 and bool(player.hand):
             return ([], [root_state])
+        elif not bool(playable_cards):
+            return ([root_state], [])
         return ([root_state], [root_state])
 
     """ 
