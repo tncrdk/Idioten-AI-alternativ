@@ -60,8 +60,12 @@ class Game:
     PLAY TURN
     """
 
-    def take_turn(self, player: abstract_agent.AbstractAgent, oppnonent):
-        playable_cards = self.get_playable_cards(player, self.pile)
+    def take_turn(
+        self,
+        player: abstract_agent.AbstractAgent,
+        oppnonent: abstract_agent.AbstractAgent,
+    ):
+        playable_cards = self.get_playable_cards(player, self.pile, False)
         can_play = bool(playable_cards)
         state = {
             "player_hand": player.hand,
@@ -77,17 +81,15 @@ class Game:
 
         else:
             player.process_state(state)
-            player_input = (
-                player.return_output()
-            )  # Returnerer en liste med hvert trekk spilleren gjør i riktig rekkefølge
-            self.make_play(player_input, self.pile, self.deck)
+            player_input = player.return_output()
+            self.make_play(player_input, self.pile, self.deck, self.burnt_cards)
             self.restore_player_hand(player, self.deck)
-            if not self.deck:
-                player.take_visible_table_cards()
-
-        if not self.deck:
-            player.take_hidden_table_cards()
-        player.check_if_finished()
+            if (
+                not (self.deck or player.hand or player.visible_table_cards)
+                and player.hidden_table_cards
+            ):
+                player.take_hidden_table_cards()
+            player.check_if_finished()
 
     def simulate_play(
         self,
@@ -97,11 +99,20 @@ class Game:
         root_state: dict,
         cards_played: list,
     ) -> tuple:
+        """Simulates a play and returns ([possible_state], [state_to_investigate])"""
+
         pile = root_state["pile"]
         deck = root_state["deck"]
+        burnt_cards = root_state["burnt_cards"]
         cards_played.append((index, card))
 
-        # sjekk for toere og tiere og sideeffekter
+        deck.add_card(player.play_card_by_index(index))
+        self.apply_side_effects(card, pile, deck, burnt_cards)
+        root_state["playable_cards"] = self.get_playable_cards(player, pile, True)
+
+        if card.value == 10 or card.value == 2 and bool(player.hand):
+            return ([], [root_state])
+        return ([root_state], [root_state])
 
     """ 
     ACTIONS
@@ -113,10 +124,11 @@ class Game:
         player_input: list,
         pile: deck.Deck,
         deck: deck.Deck,
+        burnt_cards: list,
     ) -> None:
         for play in player_input:
-            player.play_card(play)
-            self.apply_side_effects(play, pile, deck)
+            pile.add_card(player.play_card_by_index(play))
+            self.apply_side_effects(player, play, pile, deck, burnt_cards)
             # add to oppnents_cards
 
     def can_not_play_actions(
@@ -134,6 +146,23 @@ class Game:
     ) -> None:
         while len(player.hand) < 3 and deck:
             player.add_card_to_hand(deck.pop_top_card())
+
+    def apply_side_effects(
+        self,
+        player: abstract_agent.AbstractAgent,
+        card_played: deck.Card,
+        pile: deck.Deck,
+        deck: deck.Deck,
+        burnt_cards: list,
+    ) -> None:
+        """Sjekk om det skal skje noe spesielt på grunn kortet som ble spilt. Hvis ja, gjennomfør disse effektene"""
+
+        if card_played.value == 10 or self.check_4_in_a_row():
+            burnt_cards += pile
+            pile.clear()
+
+        if not (deck or player.hand) and player.visible_table_cards:
+            player.take_visible_table_cards()
 
     def log_turn(self) -> None:
         pass
@@ -184,3 +213,16 @@ class Game:
         if top_pile_card.value + 1 == card.value:
             return True
         return False
+
+    def check_4_in_a_row(self, pile) -> bool:
+        CARDS_TO_CHECK = 4
+        if len(pile) < CARDS_TO_CHECK:
+            return False
+        for card in pile[-CARDS_TO_CHECK + 1 :]:
+            if card.value != pile[-CARDS_TO_CHECK].value:
+                return False
+        return True
+
+
+if __name__ == "__main__":
+    pass

@@ -37,13 +37,11 @@ class AbstractAgent:
         self.hand.add_card(card)
 
     def take_visible_table_cards(self):
-        if not self.hand and self.visible_table_cards:
-            self.hand += self.visible_table_cards
-            self.visible_table_cards.clear_deck()
+        self.hand += self.visible_table_cards
+        self.visible_table_cards.clear_deck()
 
     def take_hidden_table_cards(self):
-        if not (self.hand or self.visible_table_cards) and self.hidden_table_cards:
-            self.add_card_to_hand(self.player.table_hidden.pop())
+        self.add_card_to_hand(self.player.table_hidden.pop())
 
     def play_card_by_index(self, index):
         return self.hand.pop_card_by_index(index)
@@ -53,6 +51,7 @@ class AbstractAgent:
     """
 
     def return_output(self) -> list:
+        """Returns a list with moves in correct order"""
         return self.output
 
     def process_state(self, state: dict) -> None:

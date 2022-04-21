@@ -58,3 +58,6 @@ state = {
             "burnt_cards": self.burnt_cards,
         }
 """
+
+if __name__ == "__main__":
+    pass
