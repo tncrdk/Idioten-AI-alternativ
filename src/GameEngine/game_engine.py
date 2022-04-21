@@ -1,5 +1,5 @@
-import deck
-import abstract_agent
+import GameEngine.deck as deck
+import GameEngine.abstract_agent as abstract_agent
 
 
 class Game:
@@ -96,27 +96,28 @@ class Game:
         player: abstract_agent.AbstractAgent,
         index: int,
         card: deck.Card,
-        root_state: dict,
+        root_state_data: dict,
         cards_played: list,
     ) -> tuple:
         """Simulates a play and returns ([possible_state], [state_to_investigate])"""
 
-        pile = root_state["pile"]
-        deck = root_state["deck"]
-        burnt_cards = root_state["burnt_cards"]
+        pile = root_state_data["pile"]
+        deck = root_state_data["deck"]
+        burnt_cards = root_state_data["burnt_cards"]
         cards_played.append((index, card))
 
         deck.add_card(player.play_card_by_index(index))
         self.apply_side_effects(card, pile, deck, burnt_cards)
 
         playable_cards = self.get_playable_cards(player, pile, True)
-        root_state["playable_cards"] = playable_cards
+        root_state_data["playable_cards"] = playable_cards
+        new_state = (root_state_data, cards_played)
 
-        if card.value == 10 or card.value == 2 and bool(player.hand):
-            return ([], [root_state])
-        elif not bool(playable_cards):
-            return ([root_state], [])
-        return ([root_state], [root_state])
+        if card.value == 10 or card.value == 2 and player.hand:
+            return ([], [new_state])
+        elif not playable_cards:
+            return ([new_state], [])
+        return ([new_state], [new_state])
 
     """ 
     ACTIONS
@@ -178,7 +179,7 @@ class Game:
     def get_playable_cards(
         self, player: abstract_agent.AbstractAgent, pile: deck.Deck, is_building: bool
     ) -> list:
-        if not bool(pile):
+        if not pile:
             playable_cards = list(enumerate(player.hand))
             return playable_cards
 
@@ -201,9 +202,7 @@ class Game:
     """
 
     def check_if_playable_card(self, card, top_pile_card) -> bool:
-        if not bool(top_pile_card):
-            return True
-        elif card.value == 2 or card.value == 10:
+        if card.value == 2 or card.value == 10:
             return True
         elif card.value >= top_pile_card.value:
             return True
@@ -226,7 +225,3 @@ class Game:
             if card.value != pile[-CARDS_TO_CHECK].value:
                 return False
         return True
-
-
-if __name__ == "__main__":
-    pass

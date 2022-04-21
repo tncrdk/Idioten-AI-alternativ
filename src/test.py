@@ -1,3 +1,6 @@
 a = [1, 2, 3]
-a.append(None)
-print(a)
+b = []
+if a:
+    print("A")
+if not b:
+    print(b[-1])

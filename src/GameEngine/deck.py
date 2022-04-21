@@ -82,9 +82,3 @@ class Deck:
 
     def clear_deck(self) -> None:
         self.cards.clear()
-
-
-if __name__ == "__main__":
-    deck = Deck()
-    deck.sort()
-    print(deck)
