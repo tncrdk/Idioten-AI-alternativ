@@ -23,6 +23,7 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
         future_states = []  # [(state_data, cards_played[(index, card)])]
         current_state = (current_state_data, [])
         self.find_all_possible_states(current_state, future_states)
+        return future_states
         # plugg inn i AI
 
     def find_all_possible_states(self, root_state: tuple, future_states: list):
@@ -44,8 +45,9 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
         for index, card in playable_cards:
             root_state_data = copy.deepcopy(root[0])
             cards_played = copy.deepcopy(root[1])
+            player = copy.deepcopy(self)
             new_possible_state, new_state_to_investigate = ge.Game.simulate_play(
-                index, card, root_state_data, cards_played
+                player, index, card, root_state_data, cards_played
             )
             possible_next_states += new_possible_state
             states_to_investigate += new_state_to_investigate
@@ -54,6 +56,7 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
 
 
 # cards_played[(index, card)]
+# hvis spilleren har to like kort funker det ikke
 """ 
 state_data = {
             "player_hand": player.hand,
@@ -61,6 +64,7 @@ state_data = {
             "player_visible_table_cards": player.visible_table_cards,
             "opponents_cards": player.opponents_cards,
             "pile": self.pile,
+            "deck": self.deck
             "burnt_cards": self.burnt_cards,
         }
 """
