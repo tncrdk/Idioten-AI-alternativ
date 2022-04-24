@@ -5,11 +5,10 @@ import GameEngine.game_engine as ge
 
 """ 
 state_data = {
-            "player_hand": player.hand,
-            "playable_cards": playable_cards,  [(index, card)]
-            "player_visible_table_cards": player.visible_table_cards,
-            "opponents_cards": player.opponents_cards,
+            "player": self.player,
+            "playable_cards": playable_cards,
             "pile": self.pile,
+            "deck": self.deck,
             "burnt_cards": self.burnt_cards,
         }
 """
@@ -45,9 +44,8 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
         for index, card in playable_cards:
             root_state_data = copy.deepcopy(root[0])
             cards_played = copy.deepcopy(root[1])
-            player = copy.deepcopy(self)
             new_possible_state, new_state_to_investigate = ge.Game.simulate_play(
-                player, index, card, root_state_data, cards_played
+                index, card, root_state_data, cards_played
             )
             possible_next_states += new_possible_state
             states_to_investigate += new_state_to_investigate
@@ -59,10 +57,8 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
 # hvis spilleren har to like kort funker det ikke
 """ 
 state_data = {
-            "player_hand": player.hand,
-            "playable_cards": playable_cards,  [(index, card)]
-            "player_visible_table_cards": player.visible_table_cards,
-            "opponents_cards": player.opponents_cards,
+            "player": self.player,
+            "playable_cards": playable_cards,
             "pile": self.pile,
             "deck": self.deck
             "burnt_cards": self.burnt_cards,

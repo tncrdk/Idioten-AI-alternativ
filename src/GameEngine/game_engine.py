@@ -67,10 +67,8 @@ class Game:
         playable_cards = self.get_playable_cards(player, self.pile, False)
         can_play = bool(playable_cards)
         state = {
-            "player_hand": player.hand,
+            "player": player,
             "playable_cards": playable_cards,
-            "player_visible_table_cards": player.visible_table_cards,
-            "opponents_cards": player.opponents_cards,
             "pile": self.pile,
             "deck": self.deck,
             "burnt_cards": self.burnt_cards,
@@ -94,7 +92,6 @@ class Game:
     @classmethod
     def simulate_play(
         self,
-        player: abstract_agent.AbstractAgent,
         index: int,
         card: deck.Card,
         root_state_data: dict,
@@ -102,6 +99,7 @@ class Game:
     ) -> tuple:
         """Simulates a play and returns ([possible_state], [state_to_investigate])"""
 
+        player = root_state_data["player"]
         pile = root_state_data["pile"]
         deck = root_state_data["deck"]
         burnt_cards = root_state_data["burnt_cards"]
@@ -112,10 +110,8 @@ class Game:
 
         playable_cards = self.get_playable_cards(player, pile, True)
         new_state_data = {
-            "player_hand": player.hand,
+            "player": player,
             "playable_cards": playable_cards,
-            "player_visible_table_cards": player.visible_table_cards,
-            "opponents_cards": player.opponents_cards,
             "pile": pile,
             "deck": deck,
             "burnt_cards": burnt_cards,

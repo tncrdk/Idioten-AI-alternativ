@@ -3,6 +3,19 @@ import GameEngine.NEAT_agents as na
 import GameEngine.deck as ge_deck
 
 
+def print_state(state):
+    state_data = state[0]
+    cards_played = state[1]
+    print("-" * 10)
+    print("Player: ")
+    for card in state_data["player"].hand:
+        card.show_card()
+
+    print("*" * 5 + "\nHistory")
+    for _, card in cards_played:
+        card.show_card()
+
+
 THREE_OF_CLUBS = ge_deck.Card(3, ge_deck.Card.SUITS.CLUBS)
 
 QUEEN_OF_SPADES = ge_deck.Card(12, ge_deck.Card.SUITS.SPADES)
@@ -38,22 +51,15 @@ player.hidden_table_cards.cards += [
 ]
 
 state = {
-    "player_hand": player.hand,
+    "player": player,
     "playable_cards": ge.Game.get_playable_cards(player, pile, False),
-    "player_visible_table_cards": player.visible_table_cards,
-    "opponents_cards": player.opponents_cards,
     "pile": pile,
     "deck": deck,
     "burnt_cards": burnt_cards,
 }
 
-print("-" * 10)
-for card in state["player_hand"]:
-    card.show_card()
-print("Pile: ")
-pile.return_top_card().show_card()
-print("-" * 10)
-
 states = player.process_state(state)
 
-print(states)
+
+for state in states:
+    print_state(state)
