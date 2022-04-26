@@ -41,7 +41,7 @@ class AbstractAgent:
         self.visible_table_cards.clear_deck()
 
     def take_hidden_table_cards(self):
-        self.add_card_to_hand(self.player.table_hidden.pop())
+        self.add_card_to_hand(self.hidden_table_cards.pop_top_card())
 
     def play_card_by_index(self, index):
         return self.hand.pop_card_by_index(index)
@@ -54,6 +54,6 @@ class AbstractAgent:
         """Returns a list with moves in correct order"""
         return self.output
 
-    def process_state(self, state: dict) -> None:
+    def process_state(self, state_data: dict) -> None:
         """Choose best play according to the policy"""
         pass

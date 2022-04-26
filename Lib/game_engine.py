@@ -66,7 +66,7 @@ class Game:
     ):
         playable_cards = self.get_playable_cards(player, self.pile, False)
         can_play = bool(playable_cards)
-        state = {
+        state_data = {
             "player": player,
             "playable_cards": playable_cards,
             "pile": self.pile,
@@ -75,10 +75,10 @@ class Game:
         }
 
         if not can_play:
-            self.can_not_play_actions(playable_cards, player, opponent, self.pile)
+            self.can_not_play_actions(player, opponent, self.pile)
 
         else:
-            player.process_state(state)
+            player.process_state(state_data)
             player_input = player.return_output()
             self.make_play(
                 player, opponent, player_input, self.pile, self.deck, self.burnt_cards
@@ -143,7 +143,7 @@ class Game:
     ) -> None:
         for index, card in player_input:
             pile.add_card(player.play_card_by_index(index))
-            cls.apply_side_effects(player, card, pile, deck, burnt_cards)
+            cls.apply_side_effects(player, card, pile, deck, burnt_cards, opponent)
 
             if card in opponent.opponents_cards:
                 opponent.opponents_cards.remove(card)
@@ -155,9 +155,9 @@ class Game:
         opponent: abstract_agent.AbstractAgent,
         pile: deck.Deck,
     ) -> None:
-        player.hand += pile.cards
+        player.hand += pile
         opponent.opponents_cards += pile.cards
-        pile.clear()
+        pile.clear_deck()
 
     @classmethod
     def restore_player_hand(
@@ -174,6 +174,7 @@ class Game:
         pile: deck.Deck,
         deck: deck.Deck,
         burnt_cards: list,
+        opponent=None,
     ) -> None:
         """Sjekker om det skal skje noe spesielt på grunn kortet som ble spilt. Hvis ja, gjennomfør disse effektene"""
 
@@ -182,6 +183,8 @@ class Game:
             pile.clear_deck()
 
         if not (deck or player.hand) and player.visible_table_cards:
+            if opponent:
+                opponent.opponents_cards += player.visible_table_cards.cards
             player.take_visible_table_cards()
 
     def log_turn(self) -> None:

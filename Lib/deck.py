@@ -44,6 +44,12 @@ class Deck:
     def __bool__(self):
         return bool(self.cards)
 
+    def __add__(self, i):
+        if type(i) != Deck:
+            raise TypeError("Må være av typen 'Deck'")
+        self.cards += i.cards
+        return self
+
     def __getitem__(self, index):
         return self.cards[index]
 
@@ -75,7 +81,7 @@ class Deck:
         if type(card) == Card:
             self.cards.append(card)
         else:
-            raise ValueError("Det er ikke av typen kort")
+            raise TypeError("Det er ikke av typen kort")
 
     def pop_card_by_index(self, index):
         return self.cards.pop(index)
