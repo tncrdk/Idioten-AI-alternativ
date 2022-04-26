@@ -80,5 +80,8 @@ class Deck:
     def pop_card_by_index(self, index):
         return self.cards.pop(index)
 
+    def pop_card_by_card(self, card):
+        self.cards.remove(card)
+
     def clear_deck(self) -> None:
         self.cards.clear()

@@ -1,6 +1,7 @@
-import GameEngine.game_engine as ge
-import GameEngine.NEAT_agents as na
-import GameEngine.deck as ge_deck
+import lib_path
+import game_engine as ge
+import NEAT_agents as na
+import deck as ge_deck
 
 
 def print_state(state):

@@ -1,5 +1,5 @@
-import GameEngine.deck as deck
-import GameEngine.abstract_agent as abstract_agent
+import deck
+import abstract_agent
 
 
 class Game:
@@ -62,7 +62,7 @@ class Game:
     def take_turn(
         self,
         player: abstract_agent.AbstractAgent,
-        oppnonent: abstract_agent.AbstractAgent,
+        opponent: abstract_agent.AbstractAgent,
     ):
         playable_cards = self.get_playable_cards(player, self.pile, False)
         can_play = bool(playable_cards)
@@ -75,12 +75,14 @@ class Game:
         }
 
         if not can_play:
-            self.can_not_play_actions(playable_cards, player, oppnonent, self.pile)
+            self.can_not_play_actions(playable_cards, player, opponent, self.pile)
 
         else:
             player.process_state(state)
             player_input = player.return_output()
-            self.make_play(player_input, self.pile, self.deck, self.burnt_cards)
+            self.make_play(
+                player, opponent, player_input, self.pile, self.deck, self.burnt_cards
+            )
             self.restore_player_hand(player, self.deck)
             if (
                 not (self.deck or player.hand or player.visible_table_cards)
@@ -91,7 +93,7 @@ class Game:
 
     @classmethod
     def simulate_play(
-        self,
+        cls,
         index: int,
         card: deck.Card,
         root_state_data: dict,
@@ -106,9 +108,9 @@ class Game:
         cards_played.append((index, card))
 
         pile.add_card(player.play_card_by_index(index))
-        self.apply_side_effects(player, card, pile, deck, burnt_cards)
+        cls.apply_side_effects(player, card, pile, deck, burnt_cards)
 
-        playable_cards = self.get_playable_cards(player, pile, True)
+        playable_cards = cls.get_playable_cards(player, pile, True)
         new_state_data = {
             "player": player,
             "playable_cards": playable_cards,
@@ -131,21 +133,24 @@ class Game:
 
     @classmethod
     def make_play(
-        self,
+        cls,
         player: abstract_agent.AbstractAgent,
-        player_input: list,
+        opponent: abstract_agent.AbstractAgent,
+        player_input: list,  # [(index, card_played), (index, card_played), ... ]
         pile: deck.Deck,
         deck: deck.Deck,
         burnt_cards: list,
     ) -> None:
-        for play in player_input:
-            pile.add_card(player.play_card_by_index(play))
-            self.apply_side_effects(player, play, pile, deck, burnt_cards)
-            # add to oppnents_cards
+        for index, card in player_input:
+            pile.add_card(player.play_card_by_index(index))
+            cls.apply_side_effects(player, card, pile, deck, burnt_cards)
+
+            if card in opponent.opponents_cards:
+                opponent.opponents_cards.remove(card)
 
     @classmethod
     def can_not_play_actions(
-        self,
+        cls,
         player: abstract_agent.AbstractAgent,
         opponent: abstract_agent.AbstractAgent,
         pile: deck.Deck,
@@ -156,23 +161,23 @@ class Game:
 
     @classmethod
     def restore_player_hand(
-        self, player: abstract_agent.AbstractAgent, deck: deck.Deck
+        cls, player: abstract_agent.AbstractAgent, deck: deck.Deck
     ) -> None:
         while len(player.hand) < 3 and deck:
             player.add_card_to_hand(deck.pop_top_card())
 
     @classmethod
     def apply_side_effects(
-        self,
+        cls,
         player: abstract_agent.AbstractAgent,
         card_played: deck.Card,
         pile: deck.Deck,
         deck: deck.Deck,
         burnt_cards: list,
     ) -> None:
-        """Sjekk om det skal skje noe spesielt på grunn kortet som ble spilt. Hvis ja, gjennomfør disse effektene"""
+        """Sjekker om det skal skje noe spesielt på grunn kortet som ble spilt. Hvis ja, gjennomfør disse effektene"""
 
-        if card_played.value == 10 or self.check_4_in_a_row(pile):
+        if card_played.value == 10 or cls.check_4_in_a_row(pile):
             burnt_cards += pile
             pile.clear_deck()
 
@@ -188,7 +193,7 @@ class Game:
 
     @classmethod
     def get_playable_cards(
-        self, player: abstract_agent.AbstractAgent, pile: deck.Deck, is_building: bool
+        cls, player: abstract_agent.AbstractAgent, pile: deck.Deck, is_building: bool
     ) -> list:
         if not pile:
             playable_cards = list(enumerate(player.hand))
@@ -197,12 +202,12 @@ class Game:
         top_pile_card = pile.return_top_card()
         if is_building:
             for index, card in enumerate(player.hand):
-                if self.check_if_buildable_card(card, top_pile_card):
+                if cls.check_if_buildable_card(card, top_pile_card):
                     playable_cards.append((index, card))
             return playable_cards
         else:
             for index, card in enumerate(player.hand):
-                if self.check_if_playable_card(card, top_pile_card):
+                if cls.check_if_playable_card(card, top_pile_card):
                     playable_cards.append((index, card))
             return playable_cards
 
@@ -211,7 +216,7 @@ class Game:
     """
 
     @classmethod
-    def check_if_playable_card(self, card, top_pile_card) -> bool:
+    def check_if_playable_card(cls, card, top_pile_card) -> bool:
         if card.value == 2 or card.value == 10:
             return True
         elif card.value >= top_pile_card.value:
@@ -219,7 +224,7 @@ class Game:
         return False
 
     @classmethod
-    def check_if_buildable_card(self, card, top_pile_card) -> bool:
+    def check_if_buildable_card(cls, card, top_pile_card) -> bool:
         if card.value == 10:
             return False
         if top_pile_card.value == card.value:
@@ -229,7 +234,7 @@ class Game:
         return False
 
     @classmethod
-    def check_4_in_a_row(self, pile) -> bool:
+    def check_4_in_a_row(cls, pile) -> bool:
         CARDS_TO_CHECK = 4
         if len(pile) < CARDS_TO_CHECK:
             return False

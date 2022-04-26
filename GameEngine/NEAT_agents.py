@@ -1,7 +1,7 @@
-import GameEngine.abstract_agent as abstract_agent
-import GameEngine.deck as deck
+import abstract_agent
+import deck
 import copy
-import GameEngine.game_engine as ge
+import game_engine as ge
 
 """ 
 state_data = {
@@ -19,24 +19,27 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
         super().__init__(name)
 
     def process_state(self, current_state_data: dict) -> None:
-        future_states = []  # [(state_data, cards_played[(index, card)])]
+        future_states = []
+        # [(state_data, cards_played), ... ] hvor cards_played: [(index, card), ... ]
         current_state = (current_state_data, [])
-        self.find_all_possible_states(current_state, future_states)
+        self.find_all_next_states(current_state, future_states)
         return future_states
         # plugg inn i AI
 
-    def find_all_possible_states(self, root_state: tuple, future_states: list):
+    def find_all_next_states(self, root_state: tuple, future_states: list):
         """
-        Oppdaterer future_states: [(state_data, cards_played)]
-        cards_played: [(index, card)]
+        Oppdaterer future_states: [(state_data, cards_played), ... ]
+        cards_played: [(index, card), ... ]
         """
-        possible_next_states, states_to_investigate = self.find_next_states(root_state)
-        future_states += possible_next_states
+        immidiate_next_states, states_to_investigate = self.find_immidiate_next_states(
+            root_state
+        )
+        future_states += immidiate_next_states
 
         for state in states_to_investigate:
-            self.find_all_possible_states(state, future_states)
+            self.find_all_next_states(state, future_states)
 
-    def find_next_states(self, root: tuple):
+    def find_immidiate_next_states(self, root: tuple):
         possible_next_states = []
         states_to_investigate = []
         playable_cards = root[0]["playable_cards"]
@@ -53,8 +56,6 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
         return possible_next_states, states_to_investigate
 
 
-# cards_played[(index, card)]
-# hvis spilleren har to like kort funker det ikke
 """ 
 state_data = {
             "player": self.player,
@@ -63,4 +64,6 @@ state_data = {
             "deck": self.deck
             "burnt_cards": self.burnt_cards,
         }
+        
+cards_played[(index, card), (index, card) ... ]
 """
