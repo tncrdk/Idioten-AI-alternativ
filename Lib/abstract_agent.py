@@ -46,6 +46,19 @@ class AbstractAgent:
     def play_card_by_index(self, index):
         return self.hand.pop_card_by_index(index)
 
+    def show_play(self, state_data: dict, card_to_play: deck.Card):
+        print("-" * 10)
+        print("Pile:")
+        pile = state_data["pile"]
+        if pile:
+            pile.return_top_card().show_card()
+        print("*" * 20 + "\nHand:")
+        for i in self.hand:
+            i.show_card()
+        print("*" * 20 + "\nPlayed card")
+        card_to_play.show_card()
+        print("-" * 20 + "\n\n")
+
     """
     AI
     """

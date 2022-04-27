@@ -5,8 +5,10 @@ import deck
 import static_agents as sa
 
 g = ge.Game(log_turn=False)
-player1 = sa.TestPlayer("1")
+player1 = sa.PlayLow_Nobuilding_Player("1")
 player2 = sa.TestPlayer("2")
 g.add_players(player1, player2)
 g.deal_cards()
-g.run_game()
+winner, _ = g.run_game()
+if winner:
+    print(winner.name)

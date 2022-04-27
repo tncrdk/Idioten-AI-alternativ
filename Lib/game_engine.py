@@ -40,6 +40,7 @@ class Game:
     def run_game(self):
         game_finished = False
         player, opponent = self.players[0], self.players[1]
+        winner = None
 
         while not game_finished:
             self.turns += 1
@@ -101,10 +102,10 @@ class Game:
     ) -> tuple:
         """Simulates a play and returns ([possible_state], [state_to_investigate])"""
 
-        player = root_state_data["player"]
-        pile = root_state_data["pile"]
-        deck = root_state_data["deck"]
-        burnt_cards = root_state_data["burnt_cards"]
+        player = root_state_data.get("player")
+        pile = root_state_data.get("pile")
+        deck = root_state_data.get("deck")
+        burnt_cards = root_state_data.get("burnt_cards")
         cards_played.append((index, card))
 
         pile.add_card(player.play_card_by_index(index))

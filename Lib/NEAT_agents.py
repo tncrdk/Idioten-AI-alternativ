@@ -42,7 +42,7 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
     def find_immidiate_next_states(self, root: tuple):
         possible_next_states = []
         states_to_investigate = []
-        playable_cards = root[0]["playable_cards"]
+        playable_cards = root[0].get("playable_cards")
 
         for index, card in playable_cards:
             root_state_data = copy.deepcopy(root[0])
