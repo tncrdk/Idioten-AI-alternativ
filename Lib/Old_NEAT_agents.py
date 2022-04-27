@@ -201,4 +201,5 @@ class NEAT_Agent3(AbstractNEAT_Agent):
                     return card, i
 
     def transform_input(self, data):
+        # range = [0,4]
         return data / 2 - 1

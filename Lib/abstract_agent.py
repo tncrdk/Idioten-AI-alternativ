@@ -16,6 +16,7 @@ class AbstractAgent:
         self.name = name
         self.finished = False
         self.opponents_cards = []
+        self.output = None
 
         self.hand = deck.Deck(generate_deck=False)
         self.visible_table_cards = deck.Deck(generate_deck=False)
