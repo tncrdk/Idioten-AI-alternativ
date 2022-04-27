@@ -42,11 +42,11 @@ class NEAT_Agent1(abstract_agent.AbstractAgent):
     def find_immidiate_next_states(self, root: tuple):
         possible_next_states = []
         states_to_investigate = []
-        playable_cards = root[0].get("playable_cards")
+        root_state_data = root[0]
+        cards_played = root[1]
+        playable_cards = root_state_data.get("playable_cards")
 
         for index, card in playable_cards:
-            root_state_data = copy.deepcopy(root[0])
-            cards_played = copy.deepcopy(root[1])
             new_possible_state, new_state_to_investigate = ge.Game.simulate_play(
                 index, card, root_state_data, cards_played
             )

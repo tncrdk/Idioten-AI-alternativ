@@ -1,9 +1,10 @@
+import copy
 import deck
 import abstract_agent
 
 
 class Game:
-    def __init__(self, log_turn: bool, custom_deck=None) -> None:
+    def __init__(self, log_game: bool, custom_deck=None) -> None:
         if bool(custom_deck):
             self.deck = custom_deck
         else:
@@ -12,7 +13,7 @@ class Game:
         self.turns = 0
         self.max_rounds = 10_000
         self.burnt_cards = []
-        self.log_turn = log_turn
+        self.log_game = log_game
 
     """ 
     SETUP
@@ -92,15 +93,20 @@ class Game:
                 player.take_hidden_table_cards()
             player.check_if_finished()
 
+        if self.log_game:
+            self.log_turn(state_data, player_input)
+
     @classmethod
     def simulate_play(
         cls,
         index: int,
         card: deck.Card,
-        root_state_data: dict,
-        cards_played: list,
+        root_state_data_old: dict,
+        cards_played_old: list,
     ) -> tuple:
         """Simulates a play and returns ([possible_state], [state_to_investigate])"""
+        root_state_data = copy.deepcopy(root_state_data_old)
+        cards_played = copy.deepcopy(cards_played_old)
 
         player = root_state_data.get("player")
         pile = root_state_data.get("pile")
@@ -111,7 +117,7 @@ class Game:
         pile.add_card(player.play_card_by_index(index))
         cls.apply_side_effects(player, card, pile, deck, burnt_cards)
 
-        playable_cards = cls.get_playable_cards(player, pile, True)
+        playable_cards = cls.get_playable_cards(player, pile, is_building=True)
         new_state_data = {
             "player": player,
             "playable_cards": playable_cards,
@@ -122,8 +128,13 @@ class Game:
 
         new_state = (new_state_data, cards_played)
 
-        if card.value == 10 or card.value == 2 and player.hand:
-            return ([], [new_state])
+        if (
+            card.value == 10
+            or card.value == 2
+            or cls.check_4_in_a_row(pile)
+            and player.hand
+        ):
+            return ([], [new_state])  # (Future_state?, state_to_investigate?)
         elif not playable_cards:
             return ([new_state], [])
         return ([new_state], [new_state])

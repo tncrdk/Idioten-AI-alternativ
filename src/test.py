@@ -1,6 +1,9 @@
-a = [1, 2, 3]
-b = []
-if a:
-    print("A")
-if not b:
-    print(b[-1])
+a = [(1, 10), (2, 9), (3, 8)]
+
+
+def foo(a):
+    a = [12, 12]
+
+
+foo(a)
+print(a)
