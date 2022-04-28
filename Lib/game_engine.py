@@ -5,7 +5,7 @@ import abstract_agent
 
 class Game:
     def __init__(self, log_game: bool, custom_deck=None) -> None:
-        if bool(custom_deck):
+        if custom_deck:
             self.deck = custom_deck
         else:
             self.deck = deck.Deck()
@@ -41,7 +41,7 @@ class Game:
     def run_game(self):
         game_finished = False
         player, opponent = self.players[0], self.players[1]
-        winner = None
+        winner = False
 
         while not game_finished:
             self.turns += 1

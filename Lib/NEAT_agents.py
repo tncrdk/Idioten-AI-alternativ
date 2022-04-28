@@ -16,9 +16,7 @@ state_data = {
 
 
 class AbstractNEAT_Agent(abstract_agent.AbstractAgent):
-    def __init__(
-        self, genome, network: neat.nn.FeedForwardNetwork, name="NEAT_Agent"
-    ) -> None:
+    def __init__(self, genome, network, name="NEAT_Agent") -> None:
         super().__init__(name=name)
         self.genome = genome
         self.network = network
@@ -33,9 +31,7 @@ class AbstractNEAT_Agent(abstract_agent.AbstractAgent):
 
 
 class NEAT_Agent(AbstractNEAT_Agent):
-    def __init__(
-        self, genome, network: neat.nn.FeedForwardNetwork, name="NEAT_Agent"
-    ) -> None:
+    def __init__(self, genome, network, name="NEAT_Agent") -> None:
         super().__init__(genome, network, name)
 
     def process_state(self, current_state_data: dict) -> None:
@@ -44,6 +40,8 @@ class NEAT_Agent(AbstractNEAT_Agent):
         current_state = (current_state_data, [])
         self.find_all_next_states(current_state, future_states)
         best_state = self.get_best_state(future_states)
+        # state: (state_data, cards_played)
+        self.output, _ = best_state
 
     def get_best_state(self, future_states) -> tuple:
         best_state = None

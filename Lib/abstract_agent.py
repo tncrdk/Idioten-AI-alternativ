@@ -15,6 +15,7 @@ class AbstractAgent:
     def __init__(self, name="Agent") -> None:
         self.name = name
         self.finished = False
+        self.wins = 0
         self.opponents_cards = []
         self.output = None
 
