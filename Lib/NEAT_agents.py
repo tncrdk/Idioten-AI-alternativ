@@ -1,3 +1,4 @@
+from random import randint
 import abstract_agent
 import deck
 import copy
@@ -40,18 +41,27 @@ class NEAT_Agent(AbstractNEAT_Agent):
         current_state = (current_state_data, [])
         self.find_all_next_states(current_state, future_states)
         best_state = self.get_best_state(future_states)
+        # print(type(best_state))
+        # self.print_state(best_state)
+
         # state: (state_data, cards_played)
-        self.output, _ = best_state
+        _, self.output = best_state
 
     def get_best_state(self, future_states) -> tuple:
         best_state = None
-        best_state_value = 0
+        best_state_value = -100
         for state in future_states:
             network_input = self.format_network_input(state)
-            state_value = self.network.activate(network_input)
+            state_value = self.network.activate(network_input)[0]
+            # print(state_value)
+            # state_value = randint(0, 10)
             if state_value > best_state_value:
                 best_state = state
                 best_state_value = state_value
+
+        # if type(best_state) == type(None):
+        #     print("HALLLLLO\n\n")
+        #     self.print_states(future_states)
 
         return best_state
 
@@ -67,7 +77,7 @@ class NEAT_Agent(AbstractNEAT_Agent):
 
         pile = state_data.get("pile")
         burnt_cards = state_data.get("burnt_cards")
-        top_card_value = pile.return_top_card().value
+        top_card_value = 0 if not pile else pile.return_top_card().value
 
         formatted_hand = [0 for _ in range(13)]
         formatted_table = [0 for _ in range(13)]
@@ -132,10 +142,10 @@ class NEAT_Agent(AbstractNEAT_Agent):
         for state in states_to_investigate:
             self.find_all_next_states(state, future_states)
 
-    def find_immidiate_next_states(self, root: tuple):
+    def find_immidiate_next_states(self, root_state: tuple):
         possible_next_states = []
         states_to_investigate = []
-        root_state_data, cards_played = root
+        root_state_data, cards_played = root_state
         playable_cards = root_state_data.get("playable_cards")
 
         for index, card in playable_cards:
@@ -146,6 +156,21 @@ class NEAT_Agent(AbstractNEAT_Agent):
             states_to_investigate += new_state_to_investigate
 
         return possible_next_states, states_to_investigate
+
+    def print_state(self, state):
+        state_data, cards_played = state
+        print("-" * 10)
+        print("Player: ")
+        for card in state_data.get("player").hand:
+            card.show_card()
+
+        print("*" * 5 + "\nCard(s) played")
+        for _, card in cards_played:
+            card.show_card()
+
+    def print_states(self, states):
+        for state in states:
+            self.print_state(state)
 
 
 """ 

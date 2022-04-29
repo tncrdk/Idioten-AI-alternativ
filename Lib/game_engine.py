@@ -129,11 +129,8 @@ class Game:
         new_state = (new_state_data, cards_played)
 
         if (
-            card.value == 10
-            or card.value == 2
-            or cls.check_4_in_a_row(pile)
-            and player.hand
-        ):
+            card.value == 10 or card.value == 2 or cls.check_4_in_a_row(pile)
+        ) and player.hand:
             return ([], [new_state])  # (Future_state?, state_to_investigate?)
         elif not playable_cards:
             return ([new_state], [])
@@ -242,6 +239,8 @@ class Game:
     def check_if_buildable_card(cls, card, top_pile_card) -> bool:
         if card.value == 10:
             return False
+        if top_pile_card.value == 2:
+            return True
         if top_pile_card.value == card.value:
             return True
         if top_pile_card.value + 1 == card.value:

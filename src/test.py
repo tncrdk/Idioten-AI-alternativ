@@ -1,10 +1,8 @@
-a = 1
+card = 2
+four = False
+hand = []
 
-
-def foo(a):
-    a += 1
-    print(a)
-
-
-foo(a)
-print(a)
+if card == 10 or card == 2 or four and hand:
+    print("Hallo")
+else:
+    print("Nei")

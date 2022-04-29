@@ -3,7 +3,6 @@ import neat
 import game_engine as ge
 import static_agents as sa
 import NEAT_agents as na
-import deck
 import abstract_agent
 import pickle
 
@@ -46,6 +45,8 @@ class NeatTraining:
         for _, genome in genomes:
             network = neat.nn.FeedForwardNetwork.create(genome, config)
             neat_agent = na.NEAT_Agent(genome, network)
+            self.tot_games_played = 0
+            self.tot_rounds_played = 0
 
             neat_win_rate, avg_rounds_played = self.play_games(
                 GAMES_TO_PLAY, neat_agent, target_agent
@@ -72,6 +73,7 @@ class NeatTraining:
             print(neat_win_rate)
             print(avg_rounds_played)
             print(agent_fitness)
+            print("-" * 10)
 
             if agent_fitness > current_best_fitness:
                 current_best_fitness = agent_fitness
