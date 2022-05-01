@@ -32,17 +32,19 @@ class AbstractNEAT_Agent(abstract_agent.AbstractAgent):
 
 
 class NEAT_Agent(AbstractNEAT_Agent):
-    def __init__(self, genome, network, name="NEAT_Agent") -> None:
+    def __init__(
+        self,
+        genome: neat.DefaultGenome,
+        network: neat.nn.FeedForwardNetwork,
+        name="NEAT_Agent",
+    ) -> None:
         super().__init__(genome, network, name)
 
     def process_state(self, current_state_data: dict) -> None:
         future_states = []
-        # [(state_data, cards_played), ... ] hvor cards_played: [(index, card), ... ]
         current_state = (current_state_data, [])
         self.find_all_next_states(current_state, future_states)
         best_state = self.get_best_state(future_states)
-        # print(type(best_state))
-        # self.print_state(best_state)
 
         # state: (state_data, cards_played)
         _, self.output = best_state
@@ -53,15 +55,9 @@ class NEAT_Agent(AbstractNEAT_Agent):
         for state in future_states:
             network_input = self.format_network_input(state)
             state_value = self.network.activate(network_input)[0]
-            # print(state_value)
-            # state_value = randint(0, 10)
             if state_value > best_state_value:
                 best_state = state
                 best_state_value = state_value
-
-        # if type(best_state) == type(None):
-        #     print("HALLLLLO\n\n")
-        #     self.print_states(future_states)
 
         return best_state
 

@@ -1,5 +1,35 @@
 {
     "python.analysis.extraPaths": [
         "./Lib"
-    ]
+    ],
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "args": [],
+            "icon": "terminal-cmd"
+        },
+        "Git Bash": {
+            "source": "Git Bash"
+        },
+        "src": {
+            "source": "PowerShell",
+            "overrideName": true,
+            "icon": "code",
+            "color": "terminal.ansiGreen"
+        },
+        "lib": {
+            "source": "PowerShell",
+            "overrideName": true,
+            "icon": "library",
+            "color": "terminal.ansiRed"
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "src"
 }
